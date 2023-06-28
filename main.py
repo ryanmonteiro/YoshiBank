@@ -10,24 +10,23 @@ menu = """d
 
 saldo = 0
 limite_vlr_saque = 500
-extrato = ""
 numero_saques = 0
 LIMITE_QNT_SAQUES = 3
 hist_transacoes = []
 
 
-def depositar(saldo, valor, hist_transacoes, /):
-    if valor > 0:
-        saldo += valor
-        hist_transacoes.append(valor)
+def depositar(aux_saldo, aux_valor, aux_hist_transacoes, /):
+    if aux_valor > 0:
+        aux_saldo += aux_valor
+        aux_hist_transacoes.append(aux_valor)
         print("Deposito efetuado com sucesso.")
-        print("Saldo atual: R$", saldo)
+        print("Saldo atual: R$", aux_saldo)
 
     else:
         print("Não é possível depositar um valor 0 ou negativo.")
         print("Por favor, repita a operação corretamente")
 
-    return saldo
+    return aux_saldo, aux_valor, aux_hist_transacoes
 
 
 def sacar(*, aux_saldo, aux_valor_saque, aux_hist_transacoes, aux_limite_vlr_saque, aux_numero_saques, aux_lim_saques):
@@ -58,16 +57,16 @@ def sacar(*, aux_saldo, aux_valor_saque, aux_hist_transacoes, aux_limite_vlr_saq
     return aux_saldo, hist_transacoes, aux_numero_saques
 
 
-def extrato(saldo, /, *, hist_transacoes):
+def extrato(aux_saldo, /, *, aux_hist_transacoes):
     print("==================Extrato==================")
-    for i in range(0, len(hist_transacoes)):
-        format_out = "{:.2f}".format(hist_transacoes[i])
-        if hist_transacoes[i] > 0:
+    for i in range(0, len(aux_hist_transacoes)):
+        format_out = "{:.2f}".format(aux_hist_transacoes[i])
+        if aux_hist_transacoes[i] > 0:
             print("Deposito: R$", format_out)
         else:
             print(f"Saque: R$", format_out)
     print("===========================================")
-    format_out = "{:.2f}".format(saldo)
+    format_out = "{:.2f}".format(aux_saldo)
     print(f"Saldo atual: R$", format_out)
 
 
@@ -76,7 +75,7 @@ while True:
 
     if opcao == "d":
         valor_deposito = float(input("Digite o valor que deseja depositar:"))
-        saldo = depositar(saldo, valor_deposito, hist_transacoes)
+        saldo, valor, hist_transacoes = depositar(saldo, valor_deposito, hist_transacoes)
 
     elif opcao == "s":
         valor_saque = float(input("digite o valor que deseja sacar:"))
@@ -88,7 +87,7 @@ while True:
                                                       aux_lim_saques=LIMITE_QNT_SAQUES)
 
     elif opcao == "e":
-        extrato(saldo, hist_transacoes=hist_transacoes)
+        extrato(saldo, aux_hist_transacoes=hist_transacoes)
 
     elif opcao == "q":
         print("Obrigado por utilizar o Yoshi's Bank!")
