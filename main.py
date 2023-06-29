@@ -1,18 +1,66 @@
 # Yoshi's Bank Software
 # Onde o seu dinheiro some em um pulo
 
-menu = """d
-    [d] Depositar
-    [s] Sacar
-    [e] Extrato
-    [q] Sair
+menu = """
+    [1] Criar usuário
+    [2] Criar conta
+    [3] Deposito
+    [4] Saque
+    [5] Extrato
+    [6] Sair
+    [7] Testar funcao
 => """
 
-saldo = 0
-limite_vlr_saque = 500
-numero_saques = 0
-LIMITE_QNT_SAQUES = 3
-hist_transacoes = []
+
+def main():
+    LIMITE_QNT_SAQUES = 3
+    AGENCIA = "0001"
+
+    saldo = 0
+    novo_saldo = 0
+    limite_vlr_saque = 500
+    numero_saques = 0
+    hist_transacoes = []
+    lista_usuarios = dict()
+
+    while True:
+        opcao = input(menu)
+
+        if opcao == "1":
+            cpf = int(input("Digite o CPF:").strip())
+            lista_usuarios.update(criar_usuario(aux_cpf=cpf, aux_lista_usuarios=lista_usuarios))
+
+        elif opcao == "2":
+            cpf = int(input("Digite o CPF:").strip())
+            #TODO  TERMINAR FUNÇÃO DE CRIAR CONTA
+
+            """lista_usuarios.update(criar_conta(aux_lista_usuarios=lista_usuarios, aux_agencia=AGENCIA, aux_saldo=saldo, aux_hist_transacoes))"""
+
+        elif opcao == "3":
+            valor_deposito = float(input("Digite o valor que deseja depositar:"))
+            saldo, valor, hist_transacoes = depositar(saldo, valor_deposito, hist_transacoes)
+
+        elif opcao == "4":
+            valor_saque = float(input("digite o valor que deseja sacar:"))
+            saldo, hist_transacoes, numero_saques = sacar(aux_saldo=saldo,
+                                                          aux_valor_saque=valor_saque,
+                                                          aux_hist_transacoes=hist_transacoes,
+                                                          aux_limite_vlr_saque=limite_vlr_saque,
+                                                          aux_numero_saques=numero_saques,
+                                                          aux_lim_saques=LIMITE_QNT_SAQUES)
+
+        elif opcao == "5":
+            extrato(saldo, aux_hist_transacoes=hist_transacoes)
+
+        elif opcao == "6":
+            print("Obrigado por utilizar o Yoshi's Bank!")
+            print("Até mais!")
+            break
+
+        elif opcao == "7":
+            print(lista_usuarios.items())
+        else:
+            print("Opção inválida. Tente novamente!")
 
 
 def depositar(aux_saldo, aux_valor, aux_hist_transacoes, /):
@@ -54,7 +102,7 @@ def sacar(*, aux_saldo, aux_valor_saque, aux_hist_transacoes, aux_limite_vlr_saq
         print("Não é possível sacar um valor 0 ou negativo.")
         print("Por favor, repita a operação corretamente")
 
-    return aux_saldo, hist_transacoes, aux_numero_saques
+    return aux_saldo, aux_hist_transacoes, aux_numero_saques
 
 
 def extrato(aux_saldo, /, *, aux_hist_transacoes):
@@ -70,28 +118,36 @@ def extrato(aux_saldo, /, *, aux_hist_transacoes):
     print(f"Saldo atual: R$", format_out)
 
 
-while True:
-    opcao = input(menu)
+def criar_usuario(*, aux_cpf, aux_lista_usuarios):
+    if aux_cpf in aux_lista_usuarios:
+        print("CPF já cadastrado na base.")
+        print("Por favor verifique os dados e tente novamente!")
+        return aux_lista_usuarios
+    dados = list()
+    dados.append(str(input("Digite o Nome:").strip()))
+    dados.append(str(input("Digite a data de nascimento no formato XX/XX/XXXX:").strip()))
+    dados.append(str(input("Digite o endereço completo:").strip()))
+    aux_lista_usuarios.update({aux_cpf: dados})
+    print("Usuário cadastrado com sucesso!")
 
-    if opcao == "d":
-        valor_deposito = float(input("Digite o valor que deseja depositar:"))
-        saldo, valor, hist_transacoes = depositar(saldo, valor_deposito, hist_transacoes)
+    return aux_lista_usuarios
 
-    elif opcao == "s":
-        valor_saque = float(input("digite o valor que deseja sacar:"))
-        saldo, hist_transacoes, numero_saques = sacar(aux_saldo=saldo,
-                                                      aux_valor_saque=valor_saque,
-                                                      aux_hist_transacoes=hist_transacoes,
-                                                      aux_limite_vlr_saque=limite_vlr_saque,
-                                                      aux_numero_saques=numero_saques,
-                                                      aux_lim_saques=LIMITE_QNT_SAQUES)
 
-    elif opcao == "e":
-        extrato(saldo, aux_hist_transacoes=hist_transacoes)
+def criar_conta(*, aux_lista_usuarios, aux_agencia, aux_conta, aux_saldo, aux_hist_transacoes):
+    cpf = int(input("Digite o CPF:").strip())
+    if cpf not in aux_lista_usuarios:
+        print("Usuário não cadastrado na base.")
+        print("Por favor realize o cadastro e tente novamente!")
+        return
+    aux_lista_usuarios[cpf] = {
+        "agencia": aux_agencia,
+        "conta": aux_conta,
+        "saldo": aux_saldo,
+        "extrato": aux_hist_transacoes
+    }
+    aux_conta += 1
+    print("Conta criada com sucesso!")
+    return aux_lista_usuarios, aux_conta, aux_saldo, aux_hist_transacoes
 
-    elif opcao == "q":
-        print("Obrigado por utilizar o Yoshi's Bank!")
-        print("Até mais!")
-        break
-    else:
-        print("Opção inválida. Tente novamente!")
+
+main()
