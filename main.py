@@ -13,11 +13,12 @@ menu = """
 
 
 def main():
-    LIMITE_QNT_SAQUES = 3
-    AGENCIA = "0001"
+    limite_qnt_saques = 3  # CONSTANTE - NÃO DEVE SER ALTERADO
+    agencia = "0001"
 
     saldo = 0
     novo_saldo = 0
+    num_conta = 1000
     limite_vlr_saque = 500
     numero_saques = 0
     hist_transacoes = []
@@ -32,9 +33,10 @@ def main():
 
         elif opcao == "2":
             cpf = int(input("Digite o CPF:").strip())
-            #TODO  TERMINAR FUNÇÃO DE CRIAR CONTA
-
-            """lista_usuarios.update(criar_conta(aux_lista_usuarios=lista_usuarios, aux_agencia=AGENCIA, aux_saldo=saldo, aux_hist_transacoes))"""
+            if criar_conta(aux_cpf=cpf, aux_lista_usuarios=lista_usuarios,
+                           aux_agencia=agencia, aux_conta=num_conta,
+                           aux_saldo=novo_saldo, aux_hist_transacoes=hist_transacoes) == 1:
+                num_conta += 1
 
         elif opcao == "3":
             valor_deposito = float(input("Digite o valor que deseja depositar:"))
@@ -47,7 +49,7 @@ def main():
                                                           aux_hist_transacoes=hist_transacoes,
                                                           aux_limite_vlr_saque=limite_vlr_saque,
                                                           aux_numero_saques=numero_saques,
-                                                          aux_lim_saques=LIMITE_QNT_SAQUES)
+                                                          aux_lim_saques=limite_qnt_saques)
 
         elif opcao == "5":
             extrato(saldo, aux_hist_transacoes=hist_transacoes)
@@ -133,21 +135,24 @@ def criar_usuario(*, aux_cpf, aux_lista_usuarios):
     return aux_lista_usuarios
 
 
-def criar_conta(*, aux_lista_usuarios, aux_agencia, aux_conta, aux_saldo, aux_hist_transacoes):
-    cpf = int(input("Digite o CPF:").strip())
-    if cpf not in aux_lista_usuarios:
+def criar_conta(*, aux_cpf, aux_lista_usuarios, aux_agencia, aux_conta, aux_saldo, aux_hist_transacoes):
+    if aux_cpf not in aux_lista_usuarios:
         print("Usuário não cadastrado na base.")
         print("Por favor realize o cadastro e tente novamente!")
-        return
-    aux_lista_usuarios[cpf] = {
-        "agencia": aux_agencia,
-        "conta": aux_conta,
-        "saldo": aux_saldo,
-        "extrato": aux_hist_transacoes
-    }
-    aux_conta += 1
+        return 0
+
+    dados = aux_lista_usuarios[aux_cpf]
+    if len(dados) > 3:
+        print("Usuário já possui conta cadastrada")
+        print("Não é possível cadastrar nova conta")
+        return 0
+    dados.append(aux_agencia)
+    dados.append(aux_conta)
+    dados.append(aux_saldo)
+    dados.append(aux_hist_transacoes)
+    aux_lista_usuarios.update({aux_cpf: dados})
     print("Conta criada com sucesso!")
-    return aux_lista_usuarios, aux_conta, aux_saldo, aux_hist_transacoes
+    return 1
 
 
 main()
